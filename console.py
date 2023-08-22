@@ -10,6 +10,7 @@ from models.state import State
 from models.city import City
 from models.amenity import Amenity
 from models.review import Review
+from models import storage
 
 
 class HBNBCommand(cmd.Cmd):
@@ -72,7 +73,7 @@ class HBNBCommand(cmd.Cmd):
                 # if arguments exist beyond _id
                 pline = pline[2].strip()  # pline is now str
                 if pline:
-                    # check for *args or **kwargs
+                    # check for *args or ** kwargs
                     if pline[0] is '{' and pline[-1] is'}'\
                             and type(eval(pline)) is dict:
                         _args = pline
@@ -115,6 +116,7 @@ class HBNBCommand(cmd.Cmd):
 
     def do_create(self, args):
         """ Create an object of any class"""
+        my_list = args.split();
         if not args:
             print("** class name missing **")
             return
@@ -122,9 +124,32 @@ class HBNBCommand(cmd.Cmd):
             print("** class doesn't exist **")
             return
         new_instance = HBNBCommand.classes[args]()
+        for attr in my_list[1:]:
+            key_param = my_list[attr].partition("=")
+            key_name = key_param[0]
+            key_value = key_param[2]
+            if key_value.startswith('"') and key_value.endswith('"'):
+                key_value = key_value[1:-1]
+                key_value = key_value.replace("_", " ")
+            elif "." in key_value:
+                try:
+                    key_value = float(key_value)
+                except ValueError:
+                    continue
+            else:
+                 try:
+                     key_value = int(key_value)
+                 except ValueError:
+                     continue
+
+            if hasattr(new_instanace, key_name):
+                setattr(new_instance, key_name, key_value)
+
+        storage.new(new_instance)
         storage.save()
         print(new_instance.id)
         storage.save()
+        
 
     def help_create(self):
         """ Help information for the create method """
