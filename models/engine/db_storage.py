@@ -41,23 +41,23 @@ class DBStorage:
             Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
-          """
-    Query the current database session for all objects of a class.
-    """
+        """
+        Query the current database session for all objects of a class.
+        """
 
-    object_dict = {}
+        object_dict = {}
 
-    if cls is None:
-        classes_to_query = classes.values()
-    else:
-        classes_to_query = [cls]
+        if cls is None:
+            classes_to_query = classes.values()
+        else:
+            classes_to_query = [cls]
 
-    for queried_cls in classes_to_query:
-        for obj in self.__session.query(queried_cls).all():
-            obj_key = f"{queried_cls.__name__}.{obj.id}"
-            object_dict[obj_key] = obj
+        for queried_cls in classes_to_query:
+            for obj in self.__session.query(queried_cls).all():
+                obj_key = f"{queried_cls.__name__}.{obj.id}"
+                object_dict[obj_key] = obj
 
-    return object_dict
+        return object_dict
 
     def new(self, obj):
         """Adds object to database"""
