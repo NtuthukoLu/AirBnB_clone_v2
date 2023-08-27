@@ -114,41 +114,28 @@ class HBNBCommand(cmd.Cmd):
         """ Overrides the emptyline method of CMD """
         pass
 
-    def do_create(self, args):
+    def do_create(self, line):
         """ Create an object of any class"""
-        my_list = args.split()
-        if not args:
-            print("** class name missing **")
-            return
-        elif args not in HBNBCommand.classes:
-            print("** class doesn't exist **")
-            return
-        new_instance = HBNBCommand.classes[args]()
-        for attr in my_list[1:]:
-            key_param = my_list[attr].partition("=")
-            key_name = key_param[0]
-            key_value = key_param[2]
-            if key_value.startswith('"') and key_value.endswith('"'):
-                key_value = key_value[1:-1]
-                key_value = key_value.replace("_", " ")
-            elif "." in key_value:
+        try:
+            if not line:
+                raise SyntaxError()
+            my_list = line.split(" ")
+            obj = eval("{}()".format(my_list[0]))
+            for attr in my_list[1:]:
+                my_att = attr.split('=')
                 try:
-                    key_value = float(key_value)
-                except ValueError:
+                    casted = HBNBCommand.verify_attribute(my_att[1])
+                except:
                     continue
-            else:
-                 try:
-                     key_value = int(key_value)
-                 except ValueError:
-                     continue
-
-            if hasattr(new_instance, key_name):
-                setattr(new_instance, key_name, key_value)
-
-        storage.new(new_instance)
-        storage.save()
-        print(new_instance.id)
-        storage.save()
+                if not casted:
+                    continue
+                setattr(obj, my_att[0], casted)
+            obj.save()
+            print("{}".format(obj.id))
+        except SyntaxError:
+            print("** class name missing **")
+        except NameError as e:
+            print("** class doesn't exist **")
         
 
     def help_create(self):
