@@ -142,7 +142,7 @@ class HBNBCommand(cmd.Cmd):
                  except ValueError:
                      continue
 
-            if hasattr(new_instanace, key_name):
+            if hasattr(new_instance, key_name):
                 setattr(new_instance, key_name, key_value)
 
         storage.new(new_instance)
