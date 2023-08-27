@@ -47,16 +47,16 @@ class DBStorage:
 
         object_dict = {}
 
-        if cls is None:
-            classes_to_query = classes.values()
+        if cls is not None:
+            for obj in self.__session.query(cls).all():
+                object_dict.update({'{}.{}'.format(type(cls).__name__,
+                                                   obj.id): obj})
         else:
-            classes_to_query = [cls]
-
-        for queried_cls in classes_to_query:
-            for obj in self.__session.query(queried_cls).all():
-                obj_key = f"{queried_cls.__name__}.{obj.id}"
-                object_dict[obj_key] = obj
-
+            for name in classes.values():
+                object_list = self.__session.query(name)
+                for obj in object_list:
+                    object_dict.update({'{}.{}'.format(type(obj).__name__,
+                                                       obj.id): obj})
         return object_dict
 
     def new(self, obj):
